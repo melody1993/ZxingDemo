@@ -41,7 +41,12 @@ final class DecodeHandler extends Handler {
 	}
 
 	private void decode(byte[] data, int width, int height) {
-        String result=processData(data,width,height);
+		byte[] rotatedData = new byte[data.length];
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++)
+				rotatedData[x * height + height - y - 1] = data[x + y * width];
+		}
+        String result=processData(rotatedData,width,height);
 		if (result != null) {
 			if(null != handler){
 				Message msg = new Message();
