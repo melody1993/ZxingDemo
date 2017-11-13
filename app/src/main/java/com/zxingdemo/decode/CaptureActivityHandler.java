@@ -68,6 +68,14 @@ public final class CaptureActivityHandler extends Handler {
 	public void quitSynchronously() {
 		state = State.DONE;
 		CameraManager.get().stopPreview();
+		Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
+		quit.sendToTarget();
+		try {
+			// Wait at most half a second; should be enough time, and onPause() will timeout quickly
+			decodeThread.join(500L);
+		} catch (InterruptedException e) {
+			// continue
+		}
 		removeMessages(R.id.decode_succeeded);
 		removeMessages(R.id.decode_failed);
 		removeMessages(R.id.decode);
