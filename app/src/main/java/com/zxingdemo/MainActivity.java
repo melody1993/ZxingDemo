@@ -76,14 +76,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     protected void onResume() {
         super.onResume();
-        SurfaceHolder surfaceHolder=capturePreview.getHolder();
-        if(hasSurface){
-            openCamera(surfaceHolder);
 
-        }else{
-            surfaceHolder.addCallback(this);
-            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        }
     }
     private void openCamera(SurfaceHolder surfaceHolder) {
         try {
@@ -113,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
@@ -121,7 +113,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void requestCodeQRCodePermissions() {
         String[] perms = {Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE};
         if (!EasyPermissions.hasPermissions(this, perms)) {
+            hasSurface=true;
             EasyPermissions.requestPermissions(this, "扫描二维码需要打开相机和散光灯的权限", REQUEST_CAMERA_PERMISSIONS, perms);
+        }else{
+            SurfaceHolder surfaceHolder=capturePreview.getHolder();
+            if(hasSurface){
+                openCamera(surfaceHolder);
+
+            }else{
+                surfaceHolder.addCallback(this);
+                surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+            }
         }
     }
 
@@ -146,7 +148,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     protected void onPause() {
         super.onPause();
-        handler.quitSynchronously();
+        if(handler!=null) {
+            handler.quitSynchronously();
+        }
         CameraManager.get().closeDriver();
 
     }
